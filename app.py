@@ -62,6 +62,16 @@ st.markdown(f"""
 .tag {{ display:inline-block; background:#22304A; color:{ACCENT}; font-size:0.78rem;
        font-weight:700; padding:0.16rem 0.6rem; border-radius:0.7rem; margin-bottom:0.45rem;
        letter-spacing:0.02em; }}
+.bigq {{ font-size:1.72rem; line-height:1.45; font-weight:700; color:{TEXT};
+       text-align:center; padding:1.5rem 1rem 1.35rem 1rem; margin:0.2rem 0 1.4rem 0;
+       background:linear-gradient(180deg,#18202F 0%,#131A28 100%);
+       border:1px solid #2A3446; border-radius:0.7rem; }}
+.bigq .q {{ color:{GOLD}; }}
+.concl {{ font-size:1.02rem; line-height:1.68; color:#D6DDE9; margin:1.1rem 0 0.4rem 0;
+       padding:0.85rem 1.1rem; background:#171D2B; border-left:5px solid {RED};
+       border-radius:0.35rem; }}
+.concl b {{ color:{GOLD}; }}
+.concl .red {{ color:{RED}; }}
 [data-testid="stMetric"] {{ background:{PANEL}; border:1px solid #26314A;
        border-radius:0.6rem; padding:0.7rem 0.9rem; }}
 [data-testid="stMetricLabel"] p {{ color:#9BA8BD !important; }}
@@ -123,12 +133,59 @@ st.markdown(
     "구축하고, 재무데이터로 손상 인식을 예측할 수 있는지 검증한 프로젝트."
 )
 
+st.markdown("")
+
+# ===== 요약 블록 — 탭을 열지 않아도 질문·방법·결론이 보이도록 상단에 고정함 =====
+st.markdown(
+    '<div class="bigq">실적이 나빠진 콘텐츠 기업은,<br>'
+    '<span class="q">이듬해 무형자산 손상을 인식하게 되는가?</span></div>',
+    unsafe_allow_html=True)
+
+s1, s2, s3 = st.columns(3)
+with s1:
+    tag("왜 이 질문을 했나")
+    plain("""
+콘텐츠 제작비는 먼저 나가고 성패는 한참 뒤에 드러남.
+그 사이 재무제표에는 아직 검증되지 않은 자산이 남음.<br><br>
+실적이 안 좋을 때, 손상을 인식하면 장부에 남지만
+<b>인식하지 않기로 한다면 그 판단은 흔적을 남기지 않음.</b>
+감사인이 볼 수 있는 것은 기록된 것들 뿐.<br><br>
+때문에, <b>"이미 공시된 실적 지표만으로 손상 가능성을 미리 가늠할 수 있다면,
+감사 계획 단계에서 주의의 우선순위를 세울 수 있지 않을까."</b>라는 질문으로
+본 프로젝트를 시작함.
+    """)
+with s2:
+    tag("어떻게 확인했나")
+    plain("""
+엔터·미디어 상장사 <b>78개사 11개년</b>.<br><br>
+공개 API에 나오지 않는 손상 금액을 사업보고서 주석에서 확보하고,
+<b>본문 잔액과 맞아떨어지는 값만 채택</b>해 390건을 검증함.<br><br>
+그 위에서 <b>가설 4개</b>를 통계 검정한 뒤,
+살아남은 변수만 모델에 투입함.
+    """)
+with s3:
+    tag("무엇을 알게 됐나")
+    plain("""
+4개 가설 중 3개가 기각되고 <b>'수익성' 측면만</b> 남음.
+그러나 변수 8개를 넣은 모델도 <b>"전기에 손상을 인식했는가"라는 단일 조건</b>을 넘지는 못함.<br><br>
+즉, <span class="red"><b>실적 지표로 손상을 미리 예측하는 것은 성립하지 않았음.</b></span><br><br>
+(대신 확인한 것 — 전기 손상 이력의 예측력은 <b>딱 1년까지만</b> 유효함(2년 뒤에는 사라짐).
+주목 기간의 실증 근거는 됨.)
+    """)
+
+st.markdown(
+    '<div class="concl">실적 악화는 손상의 배경이었으나 <span class="red">예측의 근거는 되지 못했음.</span> '
+    '손상 인식은 재무데이터로 환원되지 않는 판단의 영역이며, '
+    '이것이 감사인의 <b>\'전문가적 판단이 필요\'</b>한 이유임.</div>',
+    unsafe_allow_html=True)
+
+st.markdown("")
 c = st.columns(5)
-c[0].metric("대상 기업", f"{pipe['모집단_확정']}개사")
-c[1].metric("수집 firm-year", f"{pipe['수집_firmyear']:,}건")
-c[2].metric("검증 통과 표본", f"{pipe['확정표본']}건")
-c[3].metric("손상 인식 관측", f"{int((conf['손상액'] > 0).sum())}건")
-c[4].metric("핵심 가설", "기각", delta="p=0.39-0.78", delta_color="inverse")
+c[0].metric("분석 대상", f"{pipe['모집단_확정']}개사", delta="2015–2025 · 11개년", delta_color="off")
+c[1].metric("검증 데이터", f"{pipe['확정표본']} firm-year", delta=f"수집 {pipe['수집_firmyear']:,}건 중", delta_color="off")
+c[2].metric("검정한 가설", "4개", delta="H1–H4", delta_color="off")
+c[3].metric("살아남은 신호", "1개", delta="수익성(영업이익률)", delta_color="off")
+c[4].metric("예측 모델", "미성립", delta="단일 조건 기준선 미달", delta_color="inverse")
 
 st.divider()
 
@@ -547,6 +604,21 @@ with tab4:
 분할도 두 가지를 모두 확인함 — **연도 분할**(과거로 학습해 미래를 예측, 실제 운영과 동일)과
 **기업 분할**(같은 기업이 학습·검증에 함께 들어가는 누수 제거).
     """)
+
+    st.markdown("**모델에 투입한 변수 8개** — 위 검정에서 살아남았거나 통제 목적으로 필요한 것만 선별함")
+    st.dataframe(pd.DataFrame({
+        "변수": ["영업이익률", "당기 손상 인식 여부", "무형자산/매출액", "무형자산/영업활동현금흐름",
+               "발생액 괴리", "부채비율", "자산규모(로그)", "증가괴리(1년)"],
+        "선정 사유": ["검정에서 전 시계 유의 — 수익성 신호",
+                  "검정에서 유의 — 손상 지속성",
+                  "약하게 유의 — 매출 대비 자산 과다",
+                  "약하게 유의 — 현금창출력 대비 자산 과다",
+                  "이익의 질 통제", "재무 안정성 통제", "규모 효과 통제",
+                  "기각된 핵심 가설이지만 대조군으로 포함"],
+    }), hide_index=True, use_container_width=True)
+    st.caption("업종·연도 상대화 변수는 원변수와 VIF 90–290으로 사실상 동일해 제외함. "
+               "결측이 있는 변수는 중앙값으로 대체하고 결측 여부 플래그를 함께 투입함.")
+
     split = st.radio("분할 방식", ["연도분할", "기업분할", "t+1·연도분할"], horizontal=True)
     m = models[models["모델"].str.startswith(f"[{split}]")].copy()
     m["모델명"] = m["모델"].str.replace(f"[{split}] ", "", regex=False)
