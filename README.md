@@ -145,13 +145,24 @@ DART 재무제표 API(`fnlttSinglAcntAll`)로 손상차손을 받으려 했으�
 
 ## 실행 방법
 
+대시보드만 실행
+
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-DART OpenAPI 인증키가 필요한 수집 스크립트를 다시 돌리려면 `.env`에 키를 넣어야 함
-(`.env.example` 참조). 대시보드는 `data/`에 커밋된 결과 파일만 읽으므로 키 없이 실행 가능함.
+분석 스크립트(`src/`)까지 재현
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+대시보드는 `data/`에 커밋된 결과 파일만 읽으므로 **인증키 없이 실행 가능**함.
+수집 스크립트를 다시 돌릴 때만 `.env`에 DART OpenAPI 인증키가 필요함(`.env.example` 참조).
+
+> 의존성을 두 파일로 나눈 이유 — 대시보드는 streamlit·pandas·numpy·plotly만 사용하는데,
+> scipy·statsmodels·scikit-learn까지 함께 설치하면 배포 환경에서 불필요하게 무거워짐.
 
 ## 파일 구조
 

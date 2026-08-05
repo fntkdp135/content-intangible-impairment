@@ -1,0 +1,8 @@
+# 분석 스크립트(src/) 재현용 — 대시보드 실행에는 불필요함
+-r requirements.txt
+
+requests
+python-dotenv
+scipy
+statsmodels
+scikit-learn

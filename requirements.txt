@@ -1,9 +1,6 @@
+# 대시보드(app.py) 실행에 필요한 최소 패키지
+# 분석 스크립트(src/)를 돌리려면 requirements-dev.txt 를 함께 설치할 것
 streamlit
 pandas
 numpy
-requests
-python-dotenv
-scipy
-statsmodels
-scikit-learn
 plotly
